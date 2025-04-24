@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     
     Environment variables mapping:
     - QDRANT_URL: URL of the Qdrant vector database
-    - OPENAI_API_KEY: OpenAI API key
+    - OLLAMA_URL: URL of the Ollama server (default: http://localhost:11434)
     - EMBED_MODEL: Name of the embedding model
     - EMBED_DIM: Dimension of the embeddings
     - CLUSTER_COLLECTION: Name of the cluster collection
@@ -29,11 +29,11 @@ class Settings(BaseSettings):
     
     # Server settings
     qdrant_url: str = "http://localhost:6333"
-    openai_api_key: Optional[str] = None
+    ollama_url: str = "http://localhost:11434"
     
     # Model settings
-    embed_model: str = "text-embedding-3-small"
-    embed_dim: int = 1536
+    embed_model: str = "mxbai-embed-large"
+    embed_dim: int = 768  # mxbai-embed-large has 768 dimensions
     
     # Collection names
     cluster_collection: str = "dev_clusters"

@@ -3,13 +3,13 @@ import time
 import uuid
 from typing import List
 
-import openai
 from fastmcp import FastMCP
 from qdrant_client import QdrantClient
 from qdrant_client.models import FieldCondition, Filter, MatchValue, PointStruct
 
 from memory_alpha.params import QueryMemoryParams, StoreMemoryParams
 from memory_alpha.settings import settings
+from memory_alpha.embeddings import embed_text
 
 # Create server
 mcp = FastMCP("Memory Server", instructions=f"""
@@ -29,14 +29,8 @@ Higher level memories are more important than lower level memories. If you have 
 """
                                             )
 
-# Configure OpenAI API key
-openai.api_key = settings.openai_api_key
-
 # Initialize Qdrant client
 qdrant = QdrantClient(url=settings.qdrant_url)
-
-def embed_text(text: str) -> List[float]:
-    return openai.Embedding.create(model=settings.embed_model, input=[text])["data"][0]["embedding"]
 
 def hash_chunk_id(path, level, context):
     return hashlib.sha256(f"{path}:{level}:{context}".encode()).hexdigest()

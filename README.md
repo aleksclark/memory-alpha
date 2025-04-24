@@ -15,8 +15,8 @@ Memory Alpha is a Model Context Protocol (MCP) server that gives LLM agents the 
 
 - Python 3.10 or higher
 - [FastMCP](https://github.com/jlowin/fastmcp) (installed from GitHub)
-- OpenAI API key (for future stages)
-- Qdrant (for future stages)
+- [Ollama](https://ollama.ai/) for embeddings
+- Qdrant for vector storage
 
 ### Setup
 
@@ -31,11 +31,12 @@ uv venv
 # Activate the virtual environment
 source .venv/bin/activate
 
-# Install FastMCP from GitHub
+# Install dependencies
 uv pip install git+https://github.com/jlowin/fastmcp.git
-
-# Install the project in development mode
 uv pip install -e .
+
+# Ensure Ollama is running and has the required model
+./ensure_ollama.py
 ```
 
 ## Usage
@@ -108,14 +109,24 @@ Memory Alpha uses environment variables for configuration, which can be set dire
    ```
    # Server settings
    QDRANT_URL=http://localhost:6333
-   OPENAI_API_KEY=your-openai-api-key
+   OLLAMA_URL=http://localhost:11434
    
    # Model settings
-   EMBED_MODEL=text-embedding-3-small
+   EMBED_MODEL=mxbai-embed-large
    
    # Collection names
    CLUSTER_COLLECTION=production_clusters
    CHUNK_COLLECTION=production_chunks
+   ```
+
+3. Install Ollama from [ollama.ai](https://ollama.ai/) and pull the embedding model:
+   ```bash
+   ollama pull mxbai-embed-large
+   ```
+   
+   Alternatively, run the bundled helper script:
+   ```bash
+   ./ensure_ollama.py
    ```
 
 All settings have sensible defaults and will only be overridden by environment variables if provided.

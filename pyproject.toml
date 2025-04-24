@@ -15,8 +15,9 @@ dependencies = [
     "pydantic",
     "ruff>=0.11.6",
     "pydantic-settings>=2.9.1",
-    "openai>=1.76.0",
     "qdrant-client>=1.14.2",
+    "requests>=2.31.0",
+    "numpy>=1.26.0",
 ]
 
 [project.scripts]
