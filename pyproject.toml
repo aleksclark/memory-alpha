@@ -1,0 +1,52 @@
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[project]
+name = "memory_alpha"
+version = "0.1.0"
+description = "Model Context Protocol Server for LLM agents"
+authors = [{name = "Memory Alpha Team"}]
+requires-python = ">=3.10"
+readme = "README.md"
+dependencies = [
+    "fastmcp@git+https://github.com/jlowin/fastmcp.git",
+    "python-dotenv",
+    "pydantic",
+    "ruff>=0.11.6",
+    "pydantic-settings>=2.9.1",
+    "openai>=1.76.0",
+    "qdrant-client>=1.14.2",
+]
+
+[project.scripts]
+memory-alpha = "memory_alpha.__main__:main"
+
+# Explicitly include only the server module
+[tool.setuptools]
+py-modules = ["server"]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
