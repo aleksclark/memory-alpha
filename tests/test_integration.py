@@ -9,7 +9,7 @@ import pytest
 import requests
 
 from memory_alpha.embeddings import embed_text
-from memory_alpha.params import Chunk, StoreMemoryParams
+from memory_alpha.params import Chunk, QueryMemoryParams, StoreMemoryParams
 from memory_alpha.settings import settings
 
 
@@ -245,9 +245,9 @@ export default DataFetcher;
         ]
 
         for query_info in queries:
-            query_params = {
-                "prompt": query_info["prompt"],
-            }
+            query_params = QueryMemoryParams(
+                prompt=query_info["prompt"],
+            )
 
             result = await query_memory(query_params)
 

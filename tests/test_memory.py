@@ -8,7 +8,7 @@ These tests require:
 
 import pytest
 
-from memory_alpha.params import StoreMemoryParams
+from memory_alpha.params import QueryMemoryParams, StoreMemoryParams
 from memory_alpha.server import query_memory, store_memory
 
 
@@ -28,10 +28,11 @@ async def test_store_memory_basic(sample_store_params):
 async def test_query_with_no_data():
     """Test query_memory with empty database."""
     # This test intentionally queries before storing any data
-    query_params = {
-        "prompt": "How do I normalize a vector?",
-        "max_tokens": 500,
-    }
+    
+    query_params = QueryMemoryParams(
+        prompt="How do I normalize a vector?",
+        max_tokens=500,
+    )
 
     result = await query_memory(query_params)
 
@@ -53,10 +54,11 @@ async def test_store_and_query_full_cycle(sample_store_params):
     assert store_result["indexed"] > 0, "Failed to index any chunks"
 
     # Step 2: Query with a related prompt
-    query_params = {
-        "prompt": "How do I normalize a vector in Python?",
-        "max_tokens": 1000,
-    }
+    
+    query_params = QueryMemoryParams(
+        prompt="How do I normalize a vector in Python?",
+        max_tokens=1000,
+    )
 
     query_result = await query_memory(query_params)
 
@@ -86,11 +88,11 @@ async def test_querying_by_level(sample_store_params, level, expected_snippet):
     await store_memory(sample_store_params)
 
     # Step 2: Query for a specific level only
-    query_params = {
-        "prompt": f"Show me code related to {level}",
-        "levels": [level],  # Only search in this level
-        "max_tokens": 1000,
-    }
+    query_params = QueryMemoryParams(
+        prompt=f"Show me code related to {level}",
+        context_levels=[level],  # Only search in this level
+        max_tokens=1000,
+    )
 
     result = await query_memory(query_params)
 
@@ -111,23 +113,23 @@ async def test_token_limiting(sample_store_params):
     await store_memory(sample_store_params)
 
     # First query with a high token limit
-    query_high = {
-        "prompt": "Show me all code",
-        "max_tokens": 10000,  # Very high limit
-    }
+    query_high = QueryMemoryParams(
+        prompt="Show me all code",
+        max_tokens=4000,  # High limit within max allowed (4096)
+    )
 
     result_high = await query_memory(query_high)
 
     # Now query with a low token limit
-    query_low = {
-        "prompt": "Show me all code",
-        "max_tokens": 50,  # Very low limit
-    }
+    query_low = QueryMemoryParams(
+        prompt="Show me all code",
+        max_tokens=50,  # Very low limit
+    )
 
     result_low = await query_memory(query_low)
 
     # The low limit query should return fewer chunks or tokens
-    assert result_low["tokens"] <= query_low["max_tokens"], (
+    assert result_low["tokens"] <= query_low.max_tokens, (
         "Token limit was not respected"
     )
     assert len(result_low["chunks"]) <= len(result_high["chunks"]), (
@@ -151,9 +153,9 @@ async def test_multiple_stores_affects_importance(sample_store_params):
     await store_memory(duplicate_chunk)
 
     # Query for something related to the duplicated chunk
-    query_params = {
-        "prompt": "How to add two numbers in Python?",
-    }
+    query_params = QueryMemoryParams(
+        prompt="How to add two numbers in Python?",
+    )
 
     result = await query_memory(query_params)
 
