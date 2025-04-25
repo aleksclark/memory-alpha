@@ -182,8 +182,33 @@ All settings have sensible defaults and will only be overridden by environment v
 
 ### Running tests
 
+Memory Alpha tests require:
+- A running Qdrant server (default: http://localhost:6333)
+- A running Ollama server with mxbai-embed-large (default: http://localhost:11434)
+
+To check if the required services are running:
+
 ```bash
+./tests/check_services.py
+```
+
+To run all tests:
+
+```bash
+./run_tests.py
+```
+
+Or use pytest directly:
+
+```bash
+# Run all tests
 pytest
+
+# Run only integration tests
+pytest -m integration
+
+# Run a specific test file
+pytest tests/test_memory.py
 ```
 
 ### Linting and type checking

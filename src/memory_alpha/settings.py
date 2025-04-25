@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     ollama_url: str = "http://localhost:11434"
     
     # Model settings
-    embed_model: str = "mxbai-embed-large"
+    embed_model: str = "mxbai-embed-large:latest"
     embed_dim: int = 768  # mxbai-embed-large has 768 dimensions
     
     # Collection names

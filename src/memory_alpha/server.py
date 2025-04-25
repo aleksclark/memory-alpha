@@ -36,7 +36,7 @@ def hash_chunk_id(path, level, context):
     return hashlib.sha256(f"{path}:{level}:{context}".encode()).hexdigest()
 
 @mcp.tool(description="Store chunks of context in the memory server")
-async def query_memory(params: QueryMemoryParams):
+async def store_memory(params: StoreMemoryParams):
     commit_id = params["commit_id"]
     chunks = params.get("chunks", [])
     indexed = 0
