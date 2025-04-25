@@ -42,5 +42,6 @@ class Settings(BaseSettings):
     # Default parameters
     default_max_tokens: int = 1000
     default_k: int = 24
+    default_context_levels: List[str] = DEFAULT_CONTEXT_LEVELS
 
 settings = Settings()
