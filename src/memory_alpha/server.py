@@ -57,9 +57,10 @@ async def store_memory(params: StoreMemoryParams):
             query_filter=Filter(must=[FieldCondition(key="level", match=MatchValue(value=level))])
         )
         assigned_cluster = None
-        for h in hits:
-            if h.score >= 0.85:
-                assigned_cluster = h
+        # In new API, hits is a QueryResponse object with points attribute
+        for point in hits.points:
+            if point.score >= 0.85:
+                assigned_cluster = point
                 break
 
         cluster_id = str(uuid.uuid4())
@@ -123,7 +124,8 @@ async def query_memory(params: QueryMemoryParams):
     )
 
     candidate_chunks = []
-    for cluster in hits:
+    # In new API, hits is a QueryResponse object with points attribute
+    for cluster in hits.points:
         cluster_id = str(cluster.id)
         cluster_chunks = qdrant.scroll(
             collection_name=settings.chunk_collection,
