@@ -96,7 +96,7 @@ def test_qdrant_connection():
         pytest.fail(f"Error connecting to Qdrant: {e}")
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.integration
 async def test_end_to_end_with_real_code_samples():
     """Full integration test with real-world code samples."""

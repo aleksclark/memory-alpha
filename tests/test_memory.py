@@ -14,7 +14,7 @@ from memory_alpha.server import store_memory, query_memory
 from memory_alpha.settings import settings, DEFAULT_CONTEXT_LEVELS
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_store_memory_basic(sample_store_params):
     """Test that store_memory can store chunks without errors."""
     result = await store_memory(sample_store_params)
@@ -26,7 +26,7 @@ async def test_store_memory_basic(sample_store_params):
     # duration_ms might be present but we don't test its value
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_query_with_no_data():
     """Test query_memory with empty database."""
     # This test intentionally queries before storing any data
@@ -49,7 +49,7 @@ async def test_query_with_no_data():
     assert result["truncated"] is False
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_store_and_query_full_cycle(sample_store_params):
     """Test the full cycle of storing and then querying memory."""
     # Step 1: Store sample data
@@ -78,7 +78,7 @@ async def test_store_and_query_full_cycle(sample_store_params):
     assert query_result["tokens"] > 0, "No tokens were counted in the result"
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize(
     "level,expected_snippet",
     [
@@ -109,7 +109,7 @@ async def test_querying_by_level(sample_store_params, level, expected_snippet):
         assert chunk["level"] == level, f"Received chunk with level '{chunk['level']}' when requesting '{level}'"
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_token_limiting(sample_store_params):
     """Test that max_tokens parameter correctly limits the returned content."""
     # Step 1: Store sample data
@@ -136,7 +136,7 @@ async def test_token_limiting(sample_store_params):
     assert len(result_low["chunks"]) <= len(result_high["chunks"]), "Token limiting didn't reduce chunk count"
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_multiple_stores_affects_importance(sample_store_params):
     """Test that storing similar chunks multiple times affects their importance."""
     # Store the original chunks

@@ -14,12 +14,8 @@ from memory_alpha.settings import settings
 from memory_alpha.ensure_ollama import ensure_ollama_ready
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
+# Don't define a custom event_loop fixture; use pytest-asyncio's built-in one
+# Instead, we can configure it globally in pytest.ini
 
 
 @pytest.fixture(scope="session")
