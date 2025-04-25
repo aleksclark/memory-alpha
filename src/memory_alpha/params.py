@@ -1,6 +1,6 @@
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Any
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 from memory_alpha.settings import DEFAULT_CONTEXT_LEVELS
 
@@ -30,20 +30,24 @@ class QueryMemoryParams(BaseModel):
     filter: Optional[Dict[str, object]] = Field(None, description="Optional payload filter (e.g. by repo_path)")
     k: Optional[int] = Field(24, ge=1, le=100, description="How many hits per level before token-capping")
 
-    @root_validator(pre=True)
-    def validate_context_levels(cls, values):
-        check_levels(values.get("context_levels"))
-        return values
+    @model_validator(mode='before')
+    @classmethod
+    def validate_context_levels(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "context_levels" in data:
+            check_levels(data.get("context_levels"))
+        return data
 
 class Chunk(BaseModel):
     level: List[str]
     repo_path: str
     context: str
     score: Optional[float] = Field(default=None, description="Optional relevance score for bookkeeping")
-    @root_validator(pre=True)
-    def validate_context_levels(cls, values):
-        check_levels(values.get("context_levels"))
-        return values
+    @model_validator(mode='before')
+    @classmethod
+    def validate_context_levels(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "context_levels" in data:
+            check_levels(data.get("context_levels"))
+        return data
 
 class StoreMemoryParams(BaseModel):
     commit_id: str = Field(..., description="SHA or unique ID of the commit being indexed")
