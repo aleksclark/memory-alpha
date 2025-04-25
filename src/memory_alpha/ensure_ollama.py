@@ -3,11 +3,11 @@
 Script to ensure Ollama is running and has the required model.
 """
 
-import sys
-import requests
 import argparse
-import time
 import logging
+import sys
+
+import requests
 
 from memory_alpha.settings import settings
 
@@ -39,7 +39,7 @@ def check_model_available(model: str = None, url: str = None) -> bool:
     """Check if the specified model is available in Ollama."""
     model = model or settings.embed_model
     url = url or settings.ollama_url
-    
+
     try:
         response = requests.get(f"{url.rstrip('/')}/api/tags")
         if response.status_code == 200:
@@ -48,7 +48,9 @@ def check_model_available(model: str = None, url: str = None) -> bool:
                 logger.info(f"Model '{model}' is available in Ollama")
                 return True
             else:
-                logger.warning(f"Model '{model}' not found in Ollama. Available models: {', '.join(available_models)}")
+                logger.warning(
+                    f"Model '{model}' not found in Ollama. Available models: {', '.join(available_models)}"
+                )
                 return False
         else:
             logger.error(f"Failed to get models list: {response.status_code}")
@@ -62,13 +64,10 @@ def pull_model(model: str = None, url: str = None) -> bool:
     """Pull the specified model from Ollama."""
     model = model or settings.embed_model
     url = url or settings.ollama_url
-    
+
     try:
         logger.info(f"Pulling model '{model}' (this may take a while)...")
-        response = requests.post(
-            f"{url.rstrip('/')}/api/pull",
-            json={"name": model}
-        )
+        response = requests.post(f"{url.rstrip('/')}/api/pull", json={"name": model})
         if response.status_code == 200:
             logger.info(f"Successfully pulled model '{model}'")
             return True
@@ -80,15 +79,17 @@ def pull_model(model: str = None, url: str = None) -> bool:
         return False
 
 
-def ensure_ollama_ready(model: str = None, url: str = None, auto_pull: bool = True) -> bool:
+def ensure_ollama_ready(
+    model: str = None, url: str = None, auto_pull: bool = True
+) -> bool:
     """Ensure Ollama is running and has the required model."""
     model = model or settings.embed_model
     url = url or settings.ollama_url
-    
+
     if not check_ollama_running(url):
         logger.error("Ollama is not running. Please start Ollama first.")
         return False
-    
+
     if not check_model_available(model, url):
         if auto_pull:
             logger.info(f"Trying to pull model '{model}'...")
@@ -98,26 +99,32 @@ def ensure_ollama_ready(model: str = None, url: str = None, auto_pull: bool = Tr
                 logger.error(f"Failed to pull model '{model}'")
                 return False
         else:
-            logger.warning(f"Model '{model}' not available. You can pull it with: ollama pull {model}")
+            logger.warning(
+                f"Model '{model}' not available. You can pull it with: ollama pull {model}"
+            )
             return False
-    
+
     return True
 
 
 def main():
     """Main function for the script."""
-    parser = argparse.ArgumentParser(description="Ensure Ollama is running with the required model")
-    parser.add_argument("--model", help="The model to check/pull (default: from settings)")
-    parser.add_argument("--url", help="The Ollama API URL (default: from settings)")
-    parser.add_argument("--no-pull", action="store_true", help="Don't pull the model if it's missing")
-    args = parser.parse_args()
-    
-    success = ensure_ollama_ready(
-        model=args.model,
-        url=args.url,
-        auto_pull=not args.no_pull
+    parser = argparse.ArgumentParser(
+        description="Ensure Ollama is running with the required model"
     )
-    
+    parser.add_argument(
+        "--model", help="The model to check/pull (default: from settings)"
+    )
+    parser.add_argument("--url", help="The Ollama API URL (default: from settings)")
+    parser.add_argument(
+        "--no-pull", action="store_true", help="Don't pull the model if it's missing"
+    )
+    args = parser.parse_args()
+
+    success = ensure_ollama_ready(
+        model=args.model, url=args.url, auto_pull=not args.no_pull
+    )
+
     return 0 if success else 1
 
 

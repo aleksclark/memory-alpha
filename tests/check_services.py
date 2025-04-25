@@ -4,10 +4,10 @@ Script to check if required services (Qdrant and Ollama) are running.
 Use this before running the tests to verify the environment is properly set up.
 """
 
-import requests
-import sys
-import time
 import argparse
+import sys
+
+import requests
 
 
 def check_qdrant(url: str, timeout: int = 5) -> bool:
@@ -71,26 +71,36 @@ def check_ollama_model(url: str, model: str, timeout: int = 5) -> bool:
 
 def main():
     """Main function."""
-    parser = argparse.ArgumentParser(description="Check if required services are running")
-    parser.add_argument("--qdrant-url", default="http://localhost:6333", help="Qdrant URL")
-    parser.add_argument("--ollama-url", default="http://localhost:11434", help="Ollama URL")
-    parser.add_argument("--model", default="mxbai-embed-large:latest", help="Required Ollama model")
-    parser.add_argument("--timeout", type=int, default=5, help="Connection timeout in seconds")
+    parser = argparse.ArgumentParser(
+        description="Check if required services are running"
+    )
+    parser.add_argument(
+        "--qdrant-url", default="http://localhost:6333", help="Qdrant URL"
+    )
+    parser.add_argument(
+        "--ollama-url", default="http://localhost:11434", help="Ollama URL"
+    )
+    parser.add_argument(
+        "--model", default="mxbai-embed-large:latest", help="Required Ollama model"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=5, help="Connection timeout in seconds"
+    )
     args = parser.parse_args()
 
     print("Checking required services...")
     qdrant_ok = check_qdrant(args.qdrant_url, args.timeout)
     ollama_ok = check_ollama(args.ollama_url, args.timeout)
-    
+
     model_ok = False
     if ollama_ok:
         model_ok = check_ollama_model(args.ollama_url, args.model, args.timeout)
-    
+
     print("\nSummary:")
     print(f"Qdrant: {'✅ Ready' if qdrant_ok else '❌ Not available'}")
     print(f"Ollama: {'✅ Ready' if ollama_ok else '❌ Not available'}")
     print(f"Model '{args.model}': {'✅ Ready' if model_ok else '❌ Not available'}")
-    
+
     if qdrant_ok and ollama_ok and model_ok:
         print("\n✅ All services are running and ready for tests!")
         return 0
