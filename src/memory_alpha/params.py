@@ -47,7 +47,7 @@ class QueryMemoryParams(BaseModel):
 
 
 class Chunk(BaseModel):
-    level: List[str]
+    level: str
     repo_path: str
     context: str
     score: Optional[float] = Field(
@@ -56,9 +56,14 @@ class Chunk(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_context_levels(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "context_levels" in data:
-            check_levels(data.get("context_levels"))
+    def validate_level(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "level" in data:
+            level = data.get("level")
+            if isinstance(level, str) and level not in DEFAULT_CONTEXT_LEVELS:
+                raise ValueError(
+                    f"Invalid context level: {level}. "
+                    f"Allowed values are: {DEFAULT_CONTEXT_LEVELS}"
+                )
         return data
 
 

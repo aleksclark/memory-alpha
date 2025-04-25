@@ -8,6 +8,7 @@ These tests require:
 
 import pytest
 
+from memory_alpha.params import StoreMemoryParams
 from memory_alpha.server import query_memory, store_memory
 
 
@@ -17,7 +18,7 @@ async def test_store_memory_basic(sample_store_params):
     result = await store_memory(sample_store_params)
 
     # Check that the correct number of chunks were indexed
-    assert result["indexed"] == len(sample_store_params["chunks"])
+    assert result["indexed"] == len(sample_store_params.chunks)
     assert result["removed"] == 0
 
     # duration_ms might be present but we don't test its value
@@ -141,11 +142,11 @@ async def test_multiple_stores_affects_importance(sample_store_params):
     await store_memory(sample_store_params)
 
     # Store a duplicate of one of the chunks to increase its importance
-    duplicate_chunk = {
-        "commit_id": "test_commit_duplicate",
-        "chunks": [sample_store_params["chunks"][0]],  # Use the first chunk again
-        "repo_root": "/sample",
-    }
+    duplicate_chunk = StoreMemoryParams(
+        commit_id="test_commit_duplicate",
+        chunks=[sample_store_params.chunks[0]],  # Use the first chunk again
+        repo_root="/sample",
+    )
 
     await store_memory(duplicate_chunk)
 

@@ -10,6 +10,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 
 from memory_alpha.ensure_ollama import ensure_ollama_ready
+from memory_alpha.params import Chunk, StoreMemoryParams
 from memory_alpha.settings import settings
 
 # Don't define a custom event_loop fixture; use pytest-asyncio's built-in one
@@ -102,10 +103,14 @@ def sample_code_chunks() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-def sample_store_params(sample_code_chunks) -> Dict[str, Any]:
+def sample_store_params(sample_code_chunks):
     """Sample parameters for store_memory."""
-    return {
-        "commit_id": "test_commit_123",
-        "chunks": sample_code_chunks,
-        "repo_root": "/sample",
-    }
+    # Convert dictionary chunks to Chunk objects
+    chunk_objects = [Chunk(**chunk) for chunk in sample_code_chunks]
+    
+    # Create a StoreMemoryParams object
+    return StoreMemoryParams(
+        commit_id="test_commit_123",
+        chunks=chunk_objects,
+        repo_root="/sample",
+    )

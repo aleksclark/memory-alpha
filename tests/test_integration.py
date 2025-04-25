@@ -9,6 +9,7 @@ import pytest
 import requests
 
 from memory_alpha.embeddings import embed_text
+from memory_alpha.params import Chunk, StoreMemoryParams
 from memory_alpha.settings import settings
 
 
@@ -213,11 +214,14 @@ export default DataFetcher;
             },
         ]
 
-        # Store code samples
-        store_params = {
-            "commit_id": "test_e2e_commit",
-            "chunks": code_samples,
-        }
+        # Convert dictionary chunks to Chunk objects
+        chunk_objects = [Chunk(**chunk) for chunk in code_samples]
+        
+        # Create a StoreMemoryParams object
+        store_params = StoreMemoryParams(
+            commit_id="test_e2e_commit",
+            chunks=chunk_objects,
+        )
 
         store_result = await store_memory(store_params)
         assert store_result["indexed"] == len(code_samples), (

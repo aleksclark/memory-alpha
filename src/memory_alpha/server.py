@@ -49,17 +49,17 @@ def hash_chunk_id(path, level, context):
 
 @mcp.tool(description="Store chunks of context in the memory server")
 async def store_memory(params: StoreMemoryParams):
-    commit_id = params["commit_id"]
-    chunks = params.get("chunks", [])
+    commit_id = params.commit_id
+    chunks = params.chunks or []
     indexed = 0
 
     to_upsert_chunks = []
     to_upsert_clusters = []
     for chunk in chunks:
-        vec = embed_text(chunk["context"])
-        path = chunk["repo_path"]
-        level = chunk["level"]
-        cid = hash_chunk_id(path, level, chunk["context"])
+        vec = embed_text(chunk.context)
+        path = chunk.repo_path
+        level = chunk.level
+        cid = hash_chunk_id(path, level, chunk.context)
 
         # Search for cluster match
         hits = qdrant.query_points(
@@ -124,7 +124,7 @@ async def store_memory(params: StoreMemoryParams):
                 payload={
                     "repo_path": path,
                     "level": level,
-                    "context": chunk["context"],
+                    "context": chunk.context,
                     "cluster_id": cluster_id,  # This is now an integer
                     "commit_id": commit_id,
                     "access_count": 0,
