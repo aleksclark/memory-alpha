@@ -107,17 +107,18 @@ async def test_end_to_end_with_real_code_samples():
     """Full integration test with real-world code samples."""
     from memory_alpha.server import query_memory, store_memory
 
-    # Test collection names (to avoid interfering with production collections)
-    test_cluster_coll = f"test_e2e_clusters_{int(time.time())}"
-    test_chunk_coll = f"test_e2e_chunks_{int(time.time())}"
-
-    # Backup original settings
-    orig_cluster_coll = settings.cluster_collection
-    orig_chunk_coll = settings.chunk_collection
-
-    # Override with test collections
-    settings.cluster_collection = test_cluster_coll
-    settings.chunk_collection = test_chunk_coll
+    # Generate a test prefix (to avoid interfering with production collections)
+    test_prefix = f"test_e2e_{int(time.time())}_"
+    
+    # Backup original prefix
+    orig_prefix = settings.collection_prefix
+    
+    # Override with test prefix
+    settings.collection_prefix = test_prefix
+    
+    # Get the effective collection names
+    test_cluster_coll = settings.cluster_collection
+    test_chunk_coll = settings.chunk_collection
 
     try:
         # Create collections
@@ -266,6 +267,5 @@ export default DataFetcher;
         except Exception as e:
             print(f"Error cleaning up collections: {e}")
 
-        # Restore original settings
-        settings.cluster_collection = orig_cluster_coll
-        settings.chunk_collection = orig_chunk_coll
+        # Restore original prefix
+        settings.collection_prefix = orig_prefix

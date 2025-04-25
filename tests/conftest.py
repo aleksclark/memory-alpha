@@ -33,16 +33,19 @@ def setup_test_collections(check_ollama):
     This fixture creates unique collection names for tests to avoid
     interfering with existing collections.
     """
-    # Generate unique collection names for this test run
+    # Generate unique test prefix
     test_id = str(uuid.uuid4())[:8]
-    test_cluster_collection = f"test_clusters_{test_id}"
-    test_chunk_collection = f"test_chunks_{test_id}"
-
-    # Override settings for tests
-    original_cluster_collection = settings.cluster_collection
-    original_chunk_collection = settings.chunk_collection
-    settings.cluster_collection = test_cluster_collection
-    settings.chunk_collection = test_chunk_collection
+    test_prefix = f"test_{test_id}_"
+    
+    # Save original prefix
+    original_prefix = settings.collection_prefix
+    
+    # Override settings prefix for tests
+    settings.collection_prefix = test_prefix
+    
+    # Store the current collection names for verification and cleanup
+    test_cluster_collection = settings.cluster_collection
+    test_chunk_collection = settings.chunk_collection
 
     # Create client
     qdrant = QdrantClient(url=settings.qdrant_url)
@@ -70,9 +73,8 @@ def setup_test_collections(check_ollama):
     except Exception as e:
         print(f"Error cleaning up test collections: {e}")
 
-    # Restore original settings
-    settings.cluster_collection = original_cluster_collection
-    settings.chunk_collection = original_chunk_collection
+    # Restore original prefix
+    settings.collection_prefix = original_prefix
 
 
 @pytest.fixture

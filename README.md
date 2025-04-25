@@ -138,8 +138,7 @@ Memory Alpha uses environment variables for configuration, which can be set dire
    EMBED_MODEL=mxbai-embed-large
    
    # Collection names
-   CLUSTER_COLLECTION=production_clusters
-   CHUNK_COLLECTION=production_chunks
+   COLLECTION_PREFIX=production_
    ```
 
 3. Install Ollama from [ollama.ai](https://ollama.ai/) and pull the embedding model:
