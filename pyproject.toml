@@ -22,6 +22,8 @@ dependencies = [
 
 [project.scripts]
 memory-alpha = "memory_alpha.__main__:main"
+memory-alpha-ensure-ollama = "memory_alpha.ensure_ollama:main"
+memory-alpha-debug-settings = "memory_alpha.debug_settings:main"
 
 # Explicitly include only the server module
 [tool.setuptools]

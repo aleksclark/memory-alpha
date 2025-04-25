@@ -79,6 +79,29 @@ The project includes several validation scripts:
 - **resource://health**: Health check endpoint
 - **resource://docs/chunking**: Documentation about the chunking process
 
+## Command Line Tools
+
+When installed as a package, Memory Alpha provides several command-line tools:
+
+- **memory-alpha**: Start the MCP server
+- **memory-alpha-ensure-ollama**: Check if Ollama is running and has the required model
+- **memory-alpha-debug-settings**: Display all current settings and their sources
+
+These tools can be used with command-line arguments. For example:
+
+```bash
+# Start the server on a specific port
+memory-alpha --port 8000
+
+# Check for a different Ollama model
+memory-alpha-ensure-ollama --model mxbai-embed-large-v2
+
+# Show settings while overriding environment variables
+OLLAMA_URL=http://other-server:11434 memory-alpha-debug-settings
+```
+
+Run any command with `--help` to see all available options.
+
 ### Example queries
 
 ```bash
@@ -124,22 +147,35 @@ Memory Alpha uses environment variables for configuration, which can be set dire
    ollama pull mxbai-embed-large
    ```
    
-   Alternatively, run the bundled helper script:
+   Alternatively, if you've installed the package, use the bundled command:
+   ```bash
+   memory-alpha-ensure-ollama
+   ```
+   
+   Or run the script directly:
    ```bash
    ./ensure_ollama.py
    ```
 
 All settings have sensible defaults and will only be overridden by environment variables if provided.
 
-3. To view your current settings configuration, use the debug script:
+4. To view your current settings configuration, use one of the following:
+   
+   If you've installed the package:
+   ```bash
+   memory-alpha-debug-settings
+   ```
+   
+   Or run the script directly:
    ```bash
    python debug_settings.py
    ```
+   
    This will show all settings and their sources (default, environment variable, or .env file).
 
-   You can also set environment variables directly when running the script:
+   You can also set environment variables directly when running the command:
    ```bash
-   QDRANT_URL=http://another-server:6333 python debug_settings.py
+   QDRANT_URL=http://another-server:6333 memory-alpha-debug-settings
    ```
 
 ## Development
