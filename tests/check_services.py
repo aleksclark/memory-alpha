@@ -13,7 +13,7 @@ import argparse
 def check_qdrant(url: str, timeout: int = 5) -> bool:
     """Check if Qdrant is running at the specified URL."""
     try:
-        response = requests.get(f"{url.rstrip('/')}/health", timeout=timeout)
+        response = requests.get(f"{url.rstrip('/')}/collections", timeout=timeout)
         if response.status_code == 200:
             print(f"✅ Qdrant is running at {url}")
             return True

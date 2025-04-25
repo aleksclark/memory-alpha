@@ -71,7 +71,7 @@ def test_qdrant_connection():
             collection_name=test_collection,
             points=[
                 PointStruct(
-                    id="test_point",
+                    id=1,  # Use numeric ID instead of string
                     vector=test_vector,
                     payload={"test": True}
                 )
@@ -79,9 +79,9 @@ def test_qdrant_connection():
         )
         
         # Search for the vector
-        results = client.search(
+        results = client.query_points(
             collection_name=test_collection,
-            query_vector=test_vector,
+            query=test_vector,
             limit=1
         )
         
@@ -89,8 +89,8 @@ def test_qdrant_connection():
         client.delete_collection(collection_name=test_collection)
         
         # Verify results
-        assert len(results) == 1, "Search did not return the expected number of results"
-        assert results[0].id == "test_point", "Search did not return the expected point"
+        assert len(results.points) == 1, "Search did not return the expected number of results"
+        assert results.points[0].id == 1, "Search did not return the expected point"
         
     except Exception as e:
         pytest.fail(f"Error connecting to Qdrant: {e}")

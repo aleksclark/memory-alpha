@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     
     # Model settings
     embed_model: str = "mxbai-embed-large:latest"
-    embed_dim: int = 768  # mxbai-embed-large has 768 dimensions
+    embed_dim: int = 1024  # mxbai-embed-large has 1024 dimensions
     
     # Collection names
     cluster_collection: str = "dev_clusters"

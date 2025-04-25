@@ -50,9 +50,9 @@ async def store_memory(params: StoreMemoryParams):
         cid = hash_chunk_id(path, level, chunk["context"])
 
         # Search for cluster match
-        hits = qdrant.search(
+        hits = qdrant.query_points(
             collection_name=settings.cluster_collection,
-            query_vector=vec,
+            query=vec,
             limit=5,
             query_filter=Filter(must=[FieldCondition(key="level", match=MatchValue(value=level))])
         )
@@ -65,8 +65,10 @@ async def store_memory(params: StoreMemoryParams):
         cluster_id = str(uuid.uuid4())
         if assigned_cluster:
             cluster_id = str(assigned_cluster.id)
-            vec = [(v1 * assigned_cluster.payload["member_count"] + v2) / (assigned_cluster.payload["member_count"] + 1)
-                   for v1, v2 in zip(assigned_cluster.vector, vec, strict=False)]
+            # Make sure the vector is not None
+            if hasattr(assigned_cluster, 'vector') and assigned_cluster.vector is not None:
+                vec = [(v1 * assigned_cluster.payload["member_count"] + v2) / (assigned_cluster.payload["member_count"] + 1)
+                       for v1, v2 in zip(assigned_cluster.vector, vec, strict=False)]
             to_upsert_clusters.append(PointStruct(
                 id=cluster_id,
                 vector=vec,
@@ -113,9 +115,9 @@ async def query_memory(params: QueryMemoryParams):
     vec = embed_text(prompt)
 
     # Search cluster centroids
-    hits = qdrant.search(
+    hits = qdrant.query_points(
         collection_name=settings.cluster_collection,
-        query_vector=vec,
+        query=vec,
         limit=10,
         query_filter=Filter(must=[FieldCondition(key="level", match=MatchValue(value=levels[0]))])
     )
