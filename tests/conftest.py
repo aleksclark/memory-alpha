@@ -53,14 +53,16 @@ def setup_test_collections(check_ollama):
     qdrant = QdrantClient(url=settings.qdrant_url)
     
     # Create test collections
-    qdrant.recreate_collection(
-        collection_name=test_cluster_collection,
-        vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
-    )
-    qdrant.recreate_collection(
-        collection_name=test_chunk_collection,
-        vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
-    )
+    for collection_name in [test_cluster_collection, test_chunk_collection]:
+        # Delete collection if it exists
+        if qdrant.collection_exists(collection_name):
+            qdrant.delete_collection(collection_name)
+        
+        # Create new collection
+        qdrant.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
+        )
     
     yield
     

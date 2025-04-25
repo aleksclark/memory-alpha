@@ -58,7 +58,9 @@ def test_qdrant_connection():
         client = QdrantClient(url=settings.qdrant_url)
         
         # Create a test collection
-        client.recreate_collection(
+        if client.collection_exists(test_collection):
+            client.delete_collection(test_collection)
+        client.create_collection(
             collection_name=test_collection,
             vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
         )
@@ -118,14 +120,14 @@ async def test_end_to_end_with_real_code_samples():
         from qdrant_client.models import VectorParams, Distance
         
         client = QdrantClient(url=settings.qdrant_url)
-        client.recreate_collection(
-            collection_name=test_cluster_coll,
-            vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
-        )
-        client.recreate_collection(
-            collection_name=test_chunk_coll,
-            vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
-        )
+        # Create test collections
+        for collection_name in [test_cluster_coll, test_chunk_coll]:
+            if client.collection_exists(collection_name):
+                client.delete_collection(collection_name)
+            client.create_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(size=settings.embed_dim, distance=Distance.COSINE),
+            )
         
         # Real-world code samples
         code_samples = [
