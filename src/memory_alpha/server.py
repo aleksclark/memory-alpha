@@ -33,7 +33,16 @@ Higher level memories are more important than lower level memories. If you have 
 qdrant = QdrantClient(url=settings.qdrant_url)
 
 def hash_chunk_id(path, level, context):
-    return hashlib.sha256(f"{path}:{level}:{context}".encode()).hexdigest()
+    """Generate a numeric ID for a chunk based on its content.
+    
+    Qdrant requires IDs to be either an unsigned integer or a UUID.
+    We'll use a hash of the content and convert it to an integer.
+    """
+    # Create a hash of the content
+    hash_obj = hashlib.sha256(f"{path}:{level}:{context}".encode())
+    # Convert first 16 bytes (128 bits) of hash to integer
+    # This should be enough to avoid collisions while fitting in uint64
+    return int(hash_obj.hexdigest()[:16], 16)
 
 @mcp.tool(description="Store chunks of context in the memory server")
 async def store_memory(params: StoreMemoryParams):
@@ -63,9 +72,11 @@ async def store_memory(params: StoreMemoryParams):
                 assigned_cluster = point
                 break
 
-        cluster_id = str(uuid.uuid4())
+        # Generate a cluster ID - convert UUID to an integer
+        cluster_id = int(uuid.uuid4().int % (2**63))
         if assigned_cluster:
-            cluster_id = str(assigned_cluster.id)
+            # Use existing cluster ID if available
+            cluster_id = assigned_cluster.id if isinstance(assigned_cluster.id, int) else cluster_id
             # Make sure the vector is not None
             if hasattr(assigned_cluster, 'vector') and assigned_cluster.vector is not None:
                 vec = [(v1 * assigned_cluster.payload["member_count"] + v2) / (assigned_cluster.payload["member_count"] + 1)
@@ -93,7 +104,7 @@ async def store_memory(params: StoreMemoryParams):
                 "repo_path": path,
                 "level": level,
                 "context": chunk["context"],
-                "cluster_id": cluster_id,
+                "cluster_id": cluster_id,  # This is now an integer
                 "commit_id": commit_id,
                 "access_count": 0,
                 "timestamp": time.time()
@@ -126,7 +137,7 @@ async def query_memory(params: QueryMemoryParams):
     candidate_chunks = []
     # In new API, hits is a QueryResponse object with points attribute
     for cluster in hits.points:
-        cluster_id = str(cluster.id)
+        cluster_id = cluster.id  # Keep the original ID type (integer)
         cluster_chunks = qdrant.scroll(
             collection_name=settings.chunk_collection,
             scroll_filter=Filter(must=[
