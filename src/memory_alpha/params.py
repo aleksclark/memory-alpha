@@ -1,6 +1,6 @@
 from typing import Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 
 from memory_alpha.settings import DEFAULT_CONTEXT_LEVELS
 
@@ -33,6 +33,7 @@ class QueryMemoryParams(BaseModel):
     @root_validator(pre=True)
     def validate_context_levels(cls, values):
         check_levels(values.get("context_levels"))
+        return values
 
 class Chunk(BaseModel):
     level: List[str]
@@ -42,6 +43,7 @@ class Chunk(BaseModel):
     @root_validator(pre=True)
     def validate_context_levels(cls, values):
         check_levels(values.get("context_levels"))
+        return values
 
 class StoreMemoryParams(BaseModel):
     commit_id: str = Field(..., description="SHA or unique ID of the commit being indexed")
